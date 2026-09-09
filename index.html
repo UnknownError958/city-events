@@ -4,7 +4,13 @@
 <head> 
     <meta charset="UTF-8"> 
     <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
+    
     <title>Афіша подій міста</title> 
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+
     <link rel="stylesheet" href="css/style.css"> 
 </head> 
 
@@ -24,20 +30,36 @@
 
         <section id="events">
             <h2>Події</h2>
-            <article>
+            <article class="event-card category-music">
                 <h3>Назва події 1</h3>                
+            </article>
+
+            <article class="event-card category-theatre">
+                <h3>Назва події 2</h3>                
+            </article>
+
+            <article class="event-card category-exhibition">
+                <h3>Назва події 3</h3>                
+            </article>
+
+            <article class="event-card category-sports">
+                <h3>Назва події 4</h3>                
             </article>
         </section>
     </main>
 
-    <aside id="selected-event">
-        <h2>Деталі обраної події</h2>
+<aside id="selected-event">
+        <div class="container">
+            <h2>Деталі обраної події</h2>
+        </div>
     </aside>
 
     <footer>
-        <p>Контакти організаторів:</p>
+        <div class="container">
+            <p>Контакти організаторів:</p>
+        </div>
     </footer>
-    
+
 <script src="js/app.js"></script> 
 </body> 
 </html> 
