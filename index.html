@@ -15,45 +15,48 @@
 </head> 
 
 <body> 
-    <header>
+    <header class="site-header">
         <h1>Афіша подій міста</h1>
         <nav>
             <a href="#events">Події</a>
             <a href="#selected-event">Обрана подія</a>
         </nav>
     </header>
+    <div class="layout container">
+        <main>
+            <section id="filter">
+                <h2>Фільтр за датою/категорією</h2>
+            </section>
 
-    <main>
-        <section id="filter">
-            <h2>Фільтр за датою/категорією</h2>
-        </section>
+            <section id="events">
+                <h2>Події</h2>
+                <div class="cards">
+                    <article class="event-card category-music">
+                        <h3>Назва події 1</h3>                
+                    </article>
 
-        <section id="events">
-            <h2>Події</h2>
-            <article class="event-card category-music">
-                <h3>Назва події 1</h3>                
-            </article>
+                    <article class="event-card category-theatre">
+                        <h3>Назва події 2</h3>                
+                    </article>
 
-            <article class="event-card category-theatre">
-                <h3>Назва події 2</h3>                
-            </article>
+                    <article class="event-card category-exhibition">
+                        <h3>Назва події 3</h3>                
+                    </article>
 
-            <article class="event-card category-exhibition">
-                <h3>Назва події 3</h3>                
-            </article>
+                    <article class="event-card category-sports">
+                        <h3>Назва події 4</h3>                
+                    </article>
 
-            <article class="event-card category-sports">
-                <h3>Назва події 4</h3>                
-            </article>
-        </section>
-    </main>
+                </div>
+            </section>
+        </main>
 
-<aside id="selected-event">
-        <div class="container">
-            <h2>Деталі обраної події</h2>
-        </div>
-    </aside>
-
+        <aside id="selected-event">
+            <div class="container">
+                <h2>Деталі обраної події</h2>
+            </div>
+        </aside>
+    </div>
     <footer>
         <div class="container">
             <p>Контакти організаторів:</p>

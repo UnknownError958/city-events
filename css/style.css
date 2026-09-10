@@ -9,7 +9,7 @@ body
     font-family: 'Noto Sans', 'Helvetica Neue', Arial, sans-serif;
     font-size: 1rem;
     line-height: 1.5; 
-    color: #e2e8f0;
+    color: #f4ebeb;
     background-color: #01173c;
 } 
 
@@ -17,7 +17,7 @@ header
 {
     background-color: #000814;
     text-align: center;
-    font-size: 1.5rem; 
+    font-size: 1rem; 
     padding: 24px;
     border-bottom: 3px solid #2cab6a;
 }
@@ -25,15 +25,30 @@ header
 header h1 
 {
     color: #eee8e8; 
-    font-size: 5rem; 
+    font-size: 2rem; 
     text-shadow: 0 0 20px #3bec91;
     margin: 0;
+}
+
+.site-header
+{
+    display: flex;
+    flex-direction: column; 
+    align-items: center;
+    gap: 16px
+}
+
+header nav 
+{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
 }
 
 header nav a 
 {
     color: #eee8e8;
-    margin-right: 20px;
     font-weight: bold;
 }
 
@@ -44,16 +59,54 @@ header nav a:hover
 
 main
 {
-    margin: 0 auto;
-    max-width: 1200px;
     padding: 20px;
 }
 
 .container 
 {
-    max-width: 1200px;
+    max-width: 1600px;
     margin: 0 auto;
     padding: 0 20px;
+}
+.cards 
+{
+    display: grid;
+    grid-template-columns: 1fr; 
+    gap: 20px;
+}
+
+@media (min-width: 600px) 
+{ 
+    header h1 { font-size: 3.5rem; }
+    .cards { grid-template-columns: repeat(2, 1fr); } 
+    .event-card { font-size: 1.3rem; }
+} 
+@media (min-width: 1024px) 
+{ 
+    header 
+    {
+        flex-direction: row; 
+        justify-content: space-between; 
+        font-size: 1.5rem;
+    }
+
+    header nav 
+    {
+        flex-direction: row;
+        gap: 20px;
+    }
+
+    header h1  { font-size: 5rem; }
+
+    .cards { grid-template-columns: repeat(3, 1fr); }
+    .layout 
+    {
+        display: grid;
+        grid-template-columns: 2fr 1fr;
+        gap: 24px;
+        align-items: start; 
+    }
+    .event-card { font-size: 1.5rem; }
 }
 
 .event-card 
@@ -64,8 +117,7 @@ main
     border-left: 4px solid #faa916;
     color: #000814;
     border-radius: 20px;
-    max-width: 1200px;
-    font-size: 1.5rem; 
+    font-size: 1.1rem; 
     font-weight: bold;
     transition: all 0.3s ease; 
 }
