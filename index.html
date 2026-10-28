@@ -28,11 +28,19 @@
         <main>
             <section id="filter">
                 <h2>Фільтр за датою/категорією</h2>
+                <div id="filter-btn-container" style="display: flex; gap: 10px; margin-top: 10px;">
+                    <button class="filter-btn" data-category="Всі">Всі події</button>
+                    <button class="filter-btn" data-category="Музика">Музика</button>
+                    <button class="filter-btn" data-category="Театр">Театр</button>
+                    <button class="filter-btn" data-category="Виставка">Виставка</button>
+                    <button class="filter-btn" data-category="Спорт">Спорт</button>
+                </div>
             </section>
 
             <section id="events">
                 <h2>Події</h2>
                 <p id="events-count"></p>
+                
                 <div class="cards" id="events-list">
                     <article class="event-card category-music" data-date="18.10, 10:00">
                         <span class="badge">Музика</span>
@@ -53,9 +61,26 @@
                         <span class="badge">Спорт</span>
                         <h3>Міський благодійний марафон</h3>                
                     </article>
-
                 </div>
+                <form id="add-event-form">
+                    <label for="title">Назва події:</label>
+                    <input type="text" id="title" name="title" required pattern=".{3,}">
+                    
+                    <label for= "category">Категорія:</label>
+                    <select id="category" name="category" required>
+                        <option value="Музика">Музика</option>
+                        <option value="Театр">Театр</option>
+                        <option value="Виставка">Виставка</option>
+                        <option value="Спорт">Спорт</option>
+                    </select>
+                    <label for="date">Дата:</label>
+                    
+                    <input type="date" id="date" name="date" required>
+                    
+                    <button type="submit">Додати подію</button>
+                </form>
             </section>
+
         </main>
 
         <aside id="selected-event">

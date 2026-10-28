@@ -4,11 +4,11 @@ staticCards.forEach(card => card.remove());
 
 const cityEvents = 
 [
-    { title: 'Джазовий вечір просто неба', category: 'Музика', date: '25.10, 19:00' },
-    { title: 'Прем\'єра вистави «Тіні»', category: 'Театр', date: '26.10, 18:30' },
-    { title: 'Виставка робототехніки', category: 'Виставка', date: '27.10, 12:00' },
-    { title: 'Турнір з вуличного баскетболу', category: 'Спорт', date: '28.10, 10:00' },
-    { title: 'Акустичний концерт', category: 'Музика', date: '29.10, 20:00' }
+    { title: 'Джазовий вечір просто неба', category: 'Музика', date: '25.10.2027' },
+    { title: 'Прем\'єра вистави «Тіні»', category: 'Театр', date: '26.11.2026' },
+    { title: 'Виставка робототехніки', category: 'Виставка', date: '30.09.2027' },
+    { title: 'Турнір з вуличного баскетболу', category: 'Спорт', date: '29.10.2026' },
+    { title: 'Акустичний концерт', category: 'Музика', date: '26.12.2026' }
 ];
 
 const listContainer = document.querySelector('#events-list');
@@ -50,8 +50,11 @@ function classifyEvents()
     }
 }
 
+// Динамічне створення та відображення карток подій
 function renderEventCards(events)
 {
+    listContainer.replaceChildren();
+
     events.forEach(event => 
     {
         const article = document.createElement('article');
@@ -89,6 +92,7 @@ function renderEventCards(events)
     });
 }
 
+// Оновлення підсумкового елемента з кількістю подій
 function countEvents(events) 
 {
     if (countElement) 
@@ -105,3 +109,72 @@ const shorten = (text, n) => text.length > n ? text.slice(0, n) + '…' : text
 
 renderEventCards(cityEvents);
 countEvents(cityEvents);
+
+const form = document.querySelector('#add-event-form')
+
+// Обробник події submit: скасовує перезавантаження сторінки, зчитує дані з форми, додає новий об'єкт у масив та перемальовує картки
+form.addEventListener('submit', event => 
+{
+    event.preventDefault();
+    const title = form.querySelector('#title').value.trim();
+    const category = form.querySelector('#category').value;
+    const [year, month, day] = form.querySelector('#date').value.trim().split('-');
+    const date = `${day}.${month}.${year}`;
+
+    const newEvent = 
+    { 
+        title: title, 
+        category: category, 
+        date: date 
+    };
+
+    cityEvents.push(newEvent);
+    renderEventCards(cityEvents);
+    countEvents(cityEvents);
+    form.reset()
+});
+
+const titleInput = document.querySelector('#title');
+
+// Налаштування власних повідомлень про помилки валідації
+titleInput.addEventListener('invalid', () => 
+{
+    if (titleInput.validity.valueMissing) 
+    {
+        titleInput.setCustomValidity('Поле є обов\'язковим!');
+    } 
+    else if (titleInput.validity.patternMismatch) 
+    {
+        titleInput.setCustomValidity('Назва занадто коротка! Введіть щонайменше 3 символи.');
+    }
+});
+
+// Скидання стану помилки при введенні нового тексту
+titleInput.addEventListener('input', () => 
+{
+    titleInput.setCustomValidity(''); 
+});
+
+
+const filterContainer = document.querySelector('#filter-btn-container');
+
+// Фільтрація списку подій за категорією
+filterContainer.addEventListener('click', (event) => 
+{
+    if (event.target.tagName === 'BUTTON') 
+    {
+        const selectedCategory = event.target.dataset.category;
+        
+        if (selectedCategory === 'Всі') 
+        {
+            renderEventCards(cityEvents);
+            countEvents(cityEvents);
+        } 
+        else 
+        {
+            const filteredEvents = cityEvents.filter(event => event.category === selectedCategory);
+            renderEventCards(filteredEvents);
+            countEvents(filteredEvents);
+        }
+    }
+});
