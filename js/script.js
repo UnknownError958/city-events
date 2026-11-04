@@ -86,6 +86,10 @@ function renderEventCards(events)
         {
             article.classList.add('category-sports');
         }
+        else if (event.category === 'Свято') 
+        {
+            article.classList.add('category-holiday');
+        }
 
         article.append(categoryText, title);
         listContainer.append(article);
@@ -177,4 +181,64 @@ filterContainer.addEventListener('click', (event) =>
             countEvents(filteredEvents);
         }
     }
+});
+
+const loadingMessage = document.querySelector('#loading-message');
+const errorMessage = document.querySelector('#error-message');
+
+// Асинхронна функція для завантаження даних про свята з публічного API Nager.Date
+// Посилання на API: https://date.nager.at/
+async function loadData()
+{
+    const url = 'https://date.nager.at/api/v3/PublicHolidays/2026/UA';
+    loadingMessage.style.display = 'block';
+    errorMessage.style.display = 'none';
+
+    try
+    {
+        const response = await fetch(url);
+
+        if (!response.ok)
+        {
+            throw new Error('Дані про події не знайдено');
+        }
+
+        const data = await response.json();
+        const adaptedEvents = data.map(holiday => (
+        {
+            title: holiday.localName, 
+            category: 'Свято', 
+            date: holiday.date.split('-').reverse().join('.') 
+        }));
+
+        cityEvents.push(...adaptedEvents);
+
+        renderEventCards(cityEvents);
+        countEvents(cityEvents); 
+    } 
+    catch (error) 
+    {
+        if (error.message === 'Failed to fetch' || error.name === 'TypeError') 
+        {
+            errorMessage.textContent = 'Помилка мережі';
+        } 
+        else 
+        {
+            errorMessage.textContent = error.message;
+        }
+        
+        errorMessage.style.display = 'block';
+        console.error('Деталі помилки: ', error);
+    }
+    finally 
+    {
+        loadingMessage.style.display = 'none';
+    }
+}
+
+const reloadBtn = document.querySelector('#reload-btn');
+reloadBtn.addEventListener('click', () => 
+{
+    cityEvents.length = 5; 
+    loadData();
 });

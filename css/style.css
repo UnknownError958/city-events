@@ -176,6 +176,14 @@ header nav a:hover
 .category-theatre::after { background: var(--neon-color); color: #180800; }
 .category-theatre::before { background: #990099; }
 
+.category-holiday 
+{
+    --neon-color: #ccff00;
+    --neon-glow: rgba(204, 255, 0, 0.4); 
+}
+.category-holiday::after { background: var(--neon-color); color: #001515; }
+.category-holiday::before { background: #668000; } 
+
 .category-exhibition 
 {
     --neon-color: #ffea00;

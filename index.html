@@ -34,13 +34,16 @@
                     <button class="filter-btn" data-category="Театр">Театр</button>
                     <button class="filter-btn" data-category="Виставка">Виставка</button>
                     <button class="filter-btn" data-category="Спорт">Спорт</button>
+                    <button class="filter-btn" data-category="Свято">Свята</button>
                 </div>
             </section>
 
             <section id="events">
                 <h2>Події</h2>
                 <p id="events-count"></p>
-                
+                <p id="loading-message" style="display: none; color: #ccff00;">Завантаження даних...</p>
+                <p id="error-message" style="display: none; color: #ff0055; font-weight: bold;"></p>
+                <button id="reload-btn" style="margin-bottom: 20px;">Завантажити події</button>
                 <div class="cards" id="events-list">
                     <article class="event-card category-music" data-date="18.10, 10:00">
                         <span class="badge">Музика</span>
@@ -72,6 +75,7 @@
                         <option value="Театр">Театр</option>
                         <option value="Виставка">Виставка</option>
                         <option value="Спорт">Спорт</option>
+                        <option value="Свято">Свято</option>
                     </select>
                     <label for="date">Дата:</label>
                     
