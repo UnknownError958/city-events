@@ -1,244 +1,145 @@
-const staticCards = document.querySelectorAll('.event-card');
+//Без збірки React із JSX потребує підключення Babel standalone, який транслює JSX у браузері під час завантаження сторінки,
+//  що може бути повільніше за попередню компіляцію
 
-staticCards.forEach(card => card.remove());
-
-const cityEvents = 
-[
-    { title: 'Джазовий вечір просто неба', category: 'Музика', date: '25.10.2027' },
-    { title: 'Прем\'єра вистави «Тіні»', category: 'Театр', date: '26.11.2026' },
-    { title: 'Виставка робототехніки', category: 'Виставка', date: '30.09.2027' },
-    { title: 'Турнір з вуличного баскетболу', category: 'Спорт', date: '29.10.2026' },
-    { title: 'Акустичний концерт', category: 'Музика', date: '26.12.2026' }
-];
-
-const listContainer = document.querySelector('#events-list');
-const countElement = document.querySelector('#events-count');
-
-// Функція перебирає масив подій циклом і виводить у консоль ті, що відповідають заданій категорії
-function printEventsByCategory(category) 
-{
-    for (const event of cityEvents)
+const EventCard = {
+    props: ['title', 'category', 'date'],
+    
+    computed: 
     {
-        if (event.category === category)
+        daysUntil() 
         {
-            console.log(event.title);
+            const parts = this.date.split('.');
+            const eventDate = new Date(parts[2], parts[1] - 1, parts[0]);
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            
+            const timeLeft = eventDate - today;
+            const daysLeft = Math.round(timeLeft / (1000 * 60 * 60 * 24));
+            
+            return daysLeft;
+        },
+
+        categoryClass() 
+        {
+            if (this.category === 'Музика') return 'category-music';
+            if (this.category === 'Театр') return 'category-theatre';
+            if (this.category === 'Виставка') return 'category-exhibition';
+            if (this.category === 'Спорт') return 'category-sports';
+            if (this.category === 'Свято') return 'category-holiday';
+            return '';
+        }
+    },
+    
+
+    template: `
+        <article :class="['event-card', categoryClass]" :data-date="date">
+            <span class="badge">{{ category }}</span>
+            <h3>{{ title }}</h3>
+            <span style="position: absolute; bottom: 10px; right: 10px; color: white; font-size: 0.85rem; font-weight: bold;">
+                {{ daysUntil < 0 ? 'Подія минула' : 'Днів: ' + daysUntil }}
+            </span>
+        </article>
+    `
+};
+
+Vue.createApp({
+    components: 
+    {
+        'event-card': EventCard
+    },
+    data() 
+    {
+        return {
+            events: 
+            [
+                { id: 1, title: 'Джазовий вечір просто неба', category: 'Музика', date: '25.10.2027' },
+                { id: 2, title: 'Прем\'єра вистави «Тіні»', category: 'Театр', date: '26.11.2026' },
+                { id: 3, title: 'Виставка робототехніки', category: 'Виставка', date: '30.09.2027' },
+                { id: 4, title: 'Турнір з вуличного баскетболу', category: 'Спорт', date: '29.10.2026' },
+                { id: 5, title: 'Акустичний концерт', category: 'Музика', date: '26.12.2026' }
+            ],
+            nextId: 6,
+            loading: false,
+            error: null,
+            selectedCategory: 'Всі',
+
+            newEvent: 
+            {
+                title: '',
+                category: 'Музика',
+                date: ''
+            }
+        };
+    },
+    computed: {
+        filteredEvents() {
+            if (this.selectedCategory === 'Всі') 
+            {
+                return this.events;
+            }
+            return this.events.filter(event => event.category === this.selectedCategory);
+        }
+    },
+    methods: 
+    {
+        async loadData() 
+        {
+            this.loading = true;
+            this.error = null;
+            const url = 'https://date.nager.at/api/v3/PublicHolidays/2026/UA';
+
+            try 
+            {
+                const response = await fetch(url);
+                if (!response.ok) 
+                {
+                    throw new Error('Дані про події не знайдено');
+                }
+                const data = await response.json();
+                
+                const adaptedEvents = data.map(holiday => (
+                {
+                    id: this.nextId++,
+                    title: holiday.localName,
+                    category: 'Свято',
+                    date: holiday.date.split('-').reverse().join('.')
+                }));
+
+                this.events.push(...adaptedEvents);
+                
+            } 
+            catch (error) 
+            {
+                this.error = (error.message === 'Failed to fetch' || error.name === 'TypeError') ? 'Помилка мережі' : error.message;
+                console.error('Деталі помилки: ', error);
+            } 
+            finally 
+            {
+                this.loading = false;
+            }
+        },
+        addEvent() 
+        {
+            const [year, month, day] = this.newEvent.date.split('-');
+            const formattedDate = `${day}.${month}.${year}`;
+
+            this.events.push(
+            {
+                id: this.nextId++,
+                title: this.newEvent.title,
+                category: this.newEvent.category,
+                date: formattedDate
+            });
+
+            this.newEvent.title = '';
+            this.newEvent.category = 'Музика';
+            this.newEvent.date = '';
+        },
+
+        reloadEvents() 
+        {
+            this.events.length = 5; 
+            this.loadData();
         }
     }
-}
-
-// Функція класифікує події за допомогою умовної конструкції та виводить відповідний опис
-function classifyEvents()
-{
-    for (const event of cityEvents)
-    {
-        if (event.category === 'Музика')
-        {
-            logEventInfo(event.title, "Музичний захід для поціновувачів живої музики");
-        }
-        else if (event.category === 'Театр')
-        {
-            logEventInfo(event.title, "Вистава для любителів театрального мистецтва");
-        }
-        else if (event.category === 'Виставка')
-        {
-            logEventInfo(event.title, "Виставка для тих, хто цінує візуальне мистецтво");
-        }
-        else if (event.category === 'Спорт')
-        {
-            logEventInfo(event.title, "Спортивна подія для активних людей");
-        }
-    }
-}
-
-// Динамічне створення та відображення карток подій
-function renderEventCards(events)
-{
-    listContainer.replaceChildren();
-
-    events.forEach(event => 
-    {
-        const article = document.createElement('article');
-        
-        const categoryText = document.createElement('p');
-        categoryText.classList.add('badge'); 
-        categoryText.textContent = event.category;
-        
-        const title = document.createElement('h3');
-        title.textContent = event.title;
-
-        article.dataset.category = event.category; 
-        article.dataset.date = event.date; 
-        article.classList.add('event-card');
-
-        if (event.category === 'Музика') 
-        {
-            article.classList.add('category-music');
-        } 
-        else if (event.category === 'Театр') 
-        {
-            article.classList.add('category-theatre');
-        } 
-        else if (event.category === 'Виставка') 
-        {
-            article.classList.add('category-exhibition');
-        } 
-        else if (event.category === 'Спорт') 
-        {
-            article.classList.add('category-sports');
-        }
-        else if (event.category === 'Свято') 
-        {
-            article.classList.add('category-holiday');
-        }
-
-        article.append(categoryText, title);
-        listContainer.append(article);
-    });
-}
-
-// Оновлення підсумкового елемента з кількістю подій
-function countEvents(events) 
-{
-    if (countElement) 
-    {
-        countElement.textContent = `Загальна кількість подій: ${events.length}`;
-    }
-}
-
-// Стрілкова функція для форматованого виведення назви події та її деталей у консоль
-const logEventInfo = (title, details) => console.log(`"${title}" — ${details}`)
-
-// Стрілкова функція, яка скорочує текст до заданої кількості символів (n) і додає '...', якщо текст задовгий
-const shorten = (text, n) => text.length > n ? text.slice(0, n) + '…' : text
-
-renderEventCards(cityEvents);
-countEvents(cityEvents);
-
-const form = document.querySelector('#add-event-form')
-
-// Обробник події submit: скасовує перезавантаження сторінки, зчитує дані з форми, додає новий об'єкт у масив та перемальовує картки
-form.addEventListener('submit', event => 
-{
-    event.preventDefault();
-    const title = form.querySelector('#title').value.trim();
-    const category = form.querySelector('#category').value;
-    const [year, month, day] = form.querySelector('#date').value.trim().split('-');
-    const date = `${day}.${month}.${year}`;
-
-    const newEvent = 
-    { 
-        title: title, 
-        category: category, 
-        date: date 
-    };
-
-    cityEvents.push(newEvent);
-    renderEventCards(cityEvents);
-    countEvents(cityEvents);
-    form.reset()
-});
-
-const titleInput = document.querySelector('#title');
-
-// Налаштування власних повідомлень про помилки валідації
-titleInput.addEventListener('invalid', () => 
-{
-    if (titleInput.validity.valueMissing) 
-    {
-        titleInput.setCustomValidity('Поле є обов\'язковим!');
-    } 
-    else if (titleInput.validity.patternMismatch) 
-    {
-        titleInput.setCustomValidity('Назва занадто коротка! Введіть щонайменше 3 символи.');
-    }
-});
-
-// Скидання стану помилки при введенні нового тексту
-titleInput.addEventListener('input', () => 
-{
-    titleInput.setCustomValidity(''); 
-});
-
-
-const filterContainer = document.querySelector('#filter-btn-container');
-
-// Фільтрація списку подій за категорією
-filterContainer.addEventListener('click', (event) => 
-{
-    if (event.target.tagName === 'BUTTON') 
-    {
-        const selectedCategory = event.target.dataset.category;
-        
-        if (selectedCategory === 'Всі') 
-        {
-            renderEventCards(cityEvents);
-            countEvents(cityEvents);
-        } 
-        else 
-        {
-            const filteredEvents = cityEvents.filter(event => event.category === selectedCategory);
-            renderEventCards(filteredEvents);
-            countEvents(filteredEvents);
-        }
-    }
-});
-
-const loadingMessage = document.querySelector('#loading-message');
-const errorMessage = document.querySelector('#error-message');
-
-// Асинхронна функція для завантаження даних про свята з публічного API Nager.Date
-// Посилання на API: https://date.nager.at/
-async function loadData()
-{
-    const url = 'https://date.nager.at/api/v3/PublicHolidays/2026/UA';
-    loadingMessage.style.display = 'block';
-    errorMessage.style.display = 'none';
-
-    try
-    {
-        const response = await fetch(url);
-
-        if (!response.ok)
-        {
-            throw new Error('Дані про події не знайдено');
-        }
-
-        const data = await response.json();
-        const adaptedEvents = data.map(holiday => (
-        {
-            title: holiday.localName, 
-            category: 'Свято', 
-            date: holiday.date.split('-').reverse().join('.') 
-        }));
-
-        cityEvents.push(...adaptedEvents);
-
-        renderEventCards(cityEvents);
-        countEvents(cityEvents); 
-    } 
-    catch (error) 
-    {
-        if (error.message === 'Failed to fetch' || error.name === 'TypeError') 
-        {
-            errorMessage.textContent = 'Помилка мережі';
-        } 
-        else 
-        {
-            errorMessage.textContent = error.message;
-        }
-        
-        errorMessage.style.display = 'block';
-        console.error('Деталі помилки: ', error);
-    }
-    finally 
-    {
-        loadingMessage.style.display = 'none';
-    }
-}
-
-const reloadBtn = document.querySelector('#reload-btn');
-reloadBtn.addEventListener('click', () => 
-{
-    cityEvents.length = 5; 
-    loadData();
-});
+}).mount('#app');

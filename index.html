@@ -13,91 +13,77 @@
 
     <link rel="stylesheet" href="css/style.css"> 
 
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+
     <script src="js/script.js" defer></script>
 </head> 
 
 <body> 
-    <header class="site-header">
-        <h1>Афіша подій міста</h1>
-        <nav>
-            <a href="#events">Події</a>
-            <a href="#selected-event">Обрана подія</a>
-        </nav>
-    </header>
-    <div class="layout container">
-        <main>
-            <section id="filter">
-                <h2>Фільтр за датою/категорією</h2>
-                <div id="filter-btn-container" style="display: flex; gap: 10px; margin-top: 10px;">
-                    <button class="filter-btn" data-category="Всі">Всі події</button>
-                    <button class="filter-btn" data-category="Музика">Музика</button>
-                    <button class="filter-btn" data-category="Театр">Театр</button>
-                    <button class="filter-btn" data-category="Виставка">Виставка</button>
-                    <button class="filter-btn" data-category="Спорт">Спорт</button>
-                    <button class="filter-btn" data-category="Свято">Свята</button>
+    <div id="app">
+        <header class="site-header">
+            <h1>Афіша подій міста</h1>
+            <nav>
+                <a href="#events">Події</a>
+                <a href="#selected-event">Обрана подія</a>
+            </nav>
+        </header>
+        <div class="layout container">
+            <main>
+                <section id="filter">
+                    <h2>Фільтр за датою/категорією</h2>
+                    <div id="filter-btn-container" style="display: flex; gap: 10px; margin-top: 10px;">
+                        <button class="filter-btn" @click="selectedCategory = 'Всі'">Всі події</button>
+                        <button class="filter-btn" @click="selectedCategory = 'Музика'">Музика</button>
+                        <button class="filter-btn" @click="selectedCategory = 'Театр'">Театр</button>
+                        <button class="filter-btn" @click="selectedCategory = 'Виставка'">Виставка</button>
+                        <button class="filter-btn" @click="selectedCategory = 'Спорт'">Спорт</button>
+                        <button class="filter-btn" @click="selectedCategory = 'Свято'">Свята</button>
+                    </div>
+                </section>
+
+                <section id="events">
+                    <h2>Події</h2>
+                    <p>Загальна кількість подій: {{ filteredEvents.length }}</p>
+                    <p v-if="loading" style="color: #ccff00;">Завантаження даних...</p>
+                    <p v-if="error" style="color: #ff0055; font-weight: bold;">{{ error }}</p>
+                    <button id="reload-btn" @click="reloadEvents" style="margin-bottom: 20px;">Завантажити події</button>
+                    <div class="cards" id="events-list">
+                        <event-card 
+                            v-for="event in filteredEvents" 
+                            :key="event.id"
+                            :title="event.title"
+                            :category="event.category"
+                            :date="event.date">
+                        </event-card>
+                    </div>
+                    
+                    <form id="add-event-form" @submit.prevent="addEvent">
+                        <input type="text" id="title" v-model="newEvent.title" required>
+                        <select id="category" v-model="newEvent.category">
+                            <option value="Музика">Музика</option>
+                            <option value="Театр">Театр</option>
+                            <option value="Виставка">Виставка</option>
+                            <option value="Спорт">Спорт</option>
+                            <option value="Свято">Свято</option>
+                        </select>
+                        <input type="date" id="date" v-model="newEvent.date" required>
+                        <button type="submit">Додати подію</button>
+                    </form>
+                </section>
+
+            </main>
+
+            <aside id="selected-event">
+                <div class="container">
+                    <h2>Деталі обраної події</h2>
                 </div>
-            </section>
-
-            <section id="events">
-                <h2>Події</h2>
-                <p id="events-count"></p>
-                <p id="loading-message" style="display: none; color: #ccff00;">Завантаження даних...</p>
-                <p id="error-message" style="display: none; color: #ff0055; font-weight: bold;"></p>
-                <button id="reload-btn" style="margin-bottom: 20px;">Завантажити події</button>
-                <div class="cards" id="events-list">
-                    <article class="event-card category-music" data-date="18.10, 10:00">
-                        <span class="badge">Музика</span>
-                        <h3>Симфонічний рок-оркестр</h3>                
-                    </article>
-
-                    <article class="event-card category-theatre" data-date="18.10, 12:00">
-                        <span class="badge">Театр</span>
-                        <h3>Сучасний балет «Мавка»</h3>                
-                    </article>
-
-                    <article class="event-card category-exhibition" data-date="19.10, 15:00">
-                        <span class="badge">Виставка</span>
-                        <h3>Фотовиставка «Місто крізь роки»</h3>                
-                    </article>
-
-                    <article class="event-card category-sports" data-date="20.10, 18:00">
-                        <span class="badge">Спорт</span>
-                        <h3>Міський благодійний марафон</h3>                
-                    </article>
-                </div>
-                <form id="add-event-form">
-                    <label for="title">Назва події:</label>
-                    <input type="text" id="title" name="title" required pattern=".{3,}">
-                    
-                    <label for= "category">Категорія:</label>
-                    <select id="category" name="category" required>
-                        <option value="Музика">Музика</option>
-                        <option value="Театр">Театр</option>
-                        <option value="Виставка">Виставка</option>
-                        <option value="Спорт">Спорт</option>
-                        <option value="Свято">Свято</option>
-                    </select>
-                    <label for="date">Дата:</label>
-                    
-                    <input type="date" id="date" name="date" required>
-                    
-                    <button type="submit">Додати подію</button>
-                </form>
-            </section>
-
-        </main>
-
-        <aside id="selected-event">
-            <div class="container">
-                <h2>Деталі обраної події</h2>
-            </div>
-        </aside>
-    </div>
-    <footer>
-        <div class="container">
-            <p>Контакти організаторів:</p>
+            </aside>
         </div>
-    </footer>
-
+        <footer>
+            <div class="container">
+                <p>Контакти організаторів:</p>
+            </div>
+        </footer>
+    </div>
 </body> 
 </html> 
